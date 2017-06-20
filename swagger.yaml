@@ -11,8 +11,8 @@ info:
               * solves a number of data privacy related issues 
               * allows data to be transmitted outside of country boundaries 
               
-              De-identified data may be shared without the consent required by FERPA (34 CFR §99.30) with any
-              party for any purpose, including parents, general public, and researchers (34 CFR §99.31(b)(1)). 
+              De-identified data may be shared without the consent required by FERPA (34 CFR ยง99.30) with any
+              party for any purpose, including parents, general public, and researchers (34 CFR ยง99.31(b)(1)). 
   termsOfService: http://swagger.io/terms/
   contact:
     name: De-Identification service API specification
@@ -43,7 +43,7 @@ paths:
         Returns the full list (might not be implemented)
       operationId: get deidentification
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
@@ -66,10 +66,24 @@ paths:
             type: array
             items:
               $ref: '#/definitions/AnonRecord'
-        default:
-          description: unexpected error
+        401:
+          description: Not Authorized
           schema:
-            $ref: '#/definitions/Error'
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        405:
+          description: Method not found
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        404:
+          description: Resource not found
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
     post:
       description: |
         Creates a new anonymous ID for the given user and context. 
@@ -78,7 +92,7 @@ paths:
         record data.  Re-identification is possible by a trusted party.
       operationId: create ID
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
@@ -94,21 +108,31 @@ paths:
           description: De-Identification response
           schema:
             $ref: '#/definitions/NewAnon'
-        '409':
-          description: Conflict
+        '200':
+          description: De-Identification response, if anonamize id already exists
+          schema:
+            $ref: '#/definitions/NewAnon'
+        '400':
+          description: Bad Request
           schema:
             $ref: '#/definitions/Error'
-        default:
-          description: unexpected error
+        '401':
+          description: Not Authorized
           schema:
             $ref: '#/definitions/Error'
+        '405':
+          description: Method not found
+          schema:
+            $ref: '#/definitions/Error'
+        
+      
             
   /deidentification/{system}/users/{userId}:
     get:
       description: Return all the records for a given userId 
       operationId: Get by UserId
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
@@ -139,7 +163,7 @@ paths:
       description: Allows for more complex queries against the data set.  For example you could request all the de-identified Id's for a given course or system.
       operationId: Searchs
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
@@ -183,7 +207,7 @@ paths:
         access return 404
       operationId: GetbyContextidandUser
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
@@ -224,7 +248,7 @@ paths:
         the routes should send information to the data deletion service
       operationId: Delete One
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
@@ -266,14 +290,14 @@ paths:
         only available to authorized users.
       operationId: getbyAnonId
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
           type: string
         - name: id
           in: path
-          description: ID of pet to delete
+          description: ID of user to fetch details
           required: true
           type: integer
           format: int64
@@ -284,10 +308,24 @@ paths:
             type: array
             items:
               $ref: '#/definitions/AnonRecord'
-        default:
-          description: unexpected error
+        401:
+          description: Not Authorized
           schema:
-            $ref: '#/definitions/Error'    
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        405:
+          description: Method not found
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        404:
+          description: Resource not found
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'   
     delete:
       description: |
         Deletes all of the mappings for a given user. This will remove all of the users records rendering all
@@ -295,7 +333,7 @@ paths:
         the routes should send information to the data deletion service
       operationId: deleteMappings
       parameters:
-        - name: X-Authoization
+        - name: X-Authorization
           in: header
           description: the authentication header that must be sent with every request
           required: true
